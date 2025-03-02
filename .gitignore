@@ -1,0 +1,7 @@
+.DS_Store
+bin
+test-ledger
+node-1-pubkey
+node-1-wallet.json
+node-2-pubkey
+node-2-wallet.json
