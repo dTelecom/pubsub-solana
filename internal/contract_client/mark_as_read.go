@@ -2,12 +2,15 @@ package contract_client
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gagliardetto/solana-go"
 )
 
 // MarkAsRead marking the message as read
 func (c *SolanaClient) MarkAsRead(ctx context.Context, sender solana.PublicKey, timestamp int64) (solana.Signature, error) {
+	fmt.Printf("➡️ Marking message as read for sender %v\n", sender)
+
 	messagePubkey, _, _ := solana.FindProgramAddress([][]byte{
 		[]byte("message"),
 		sender.Bytes(),

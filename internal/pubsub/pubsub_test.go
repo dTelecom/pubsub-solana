@@ -122,29 +122,55 @@ func Test_Happy(t *testing.T) {
 	})
 
 	t.Run("publish", func(t *testing.T) {
+		waitCh := make(chan interface{}, 1)
+
+		outgoingMessageHandler(context.Background(), contract_client.MessageData{
+			Read: true,
+		})
+
 		messageIdGenerator.EXPECT().Generate().Times(1).Return("test-id1")
 
 		magicblockClient.EXPECT().
 			SendMessage(gomock.Any(), anotherNode.PublicKey(), mustSerialize("test-id1", "test-topic", []byte("test-value1"))).
 			Times(1).
-			Return(solana.Signature{}, nil)
+			DoAndReturn(func(ctx, receiver, content interface{}) (solana.Signature, error) {
+				waitCh <- new(interface{})
+				return solana.Signature{}, nil
+			})
 
-		_, err := ps.Publish(context.Background(), "test-topic", []byte("test-value1"))
+		_, err := ps.Publish("test-topic", []byte("test-value1"))
 		require.NoError(t, err, "publish error")
+
+		select {
+		case <-waitCh:
+		case <-time.After(time.Second):
+			require.FailNow(t, "timeout")
+		}
 
 		messageIdGenerator.EXPECT().Generate().Times(1).Return("test-id2")
 
-		_, err = ps.Publish(context.Background(), "test-topic", []byte("test-value2"))
+		_, err = ps.Publish("test-topic", []byte("test-value2"))
 		require.NoError(t, err, "publish error")
+
+		time.Sleep(time.Second) // to be sure that no more calls
 
 		magicblockClient.EXPECT().
 			SendMessage(gomock.Any(), anotherNode.PublicKey(), mustSerialize("test-id2", "test-topic", []byte("test-value2"))).
 			Times(1).
-			Return(solana.Signature{}, nil)
+			DoAndReturn(func(ctx, receiver, content interface{}) (solana.Signature, error) {
+				waitCh <- new(interface{})
+				return solana.Signature{}, nil
+			})
 
 		outgoingMessageHandler(context.Background(), contract_client.MessageData{
 			Read: true,
 		})
+
+		select {
+		case <-waitCh:
+		case <-time.After(time.Second):
+			require.FailNow(t, "timeout")
+		}
 
 		outgoingMessageHandler(context.Background(), contract_client.MessageData{
 			Read: true,
@@ -155,9 +181,18 @@ func Test_Happy(t *testing.T) {
 		magicblockClient.EXPECT().
 			SendMessage(gomock.Any(), anotherNode.PublicKey(), mustSerialize("test-id3", "test-topic", []byte("test-value3"))).
 			Times(1).
-			Return(solana.Signature{}, nil)
+			DoAndReturn(func(ctx, receiver, content interface{}) (solana.Signature, error) {
+				waitCh <- new(interface{})
+				return solana.Signature{}, nil
+			})
 
-		_, err = ps.Publish(context.Background(), "test-topic", []byte("test-value3"))
+		_, err = ps.Publish("test-topic", []byte("test-value3"))
 		require.NoError(t, err, "publish error")
+
+		select {
+		case <-waitCh:
+		case <-time.After(time.Second):
+			require.FailNow(t, "timeout")
+		}
 	})
 }

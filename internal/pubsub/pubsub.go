@@ -12,7 +12,8 @@ type PubSub struct {
 	messageIdGenerator       MessageIdGenerator
 	dataEncoder              DataEncoder
 
-	recipients map[solana.PublicKey]*recipientType
+	messageQueue chan []byte
+	recipients   map[solana.PublicKey]*recipientType
 
 	subscriptions   map[string][]Handler
 	subscriptionsMu sync.RWMutex
@@ -24,6 +25,7 @@ func New(client, magicblockClient ContractClient, messageIdGenerator MessageIdGe
 		contractMagicblockClient: magicblockClient,
 		messageIdGenerator:       messageIdGenerator,
 		dataEncoder:              dataEncoder,
+		messageQueue:             make(chan []byte, 100),
 		recipients:               map[solana.PublicKey]*recipientType{},
 		subscriptions:            map[string][]Handler{},
 	}

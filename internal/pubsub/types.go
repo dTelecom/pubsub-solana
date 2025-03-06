@@ -2,7 +2,6 @@ package pubsub
 
 import (
 	"context"
-	"sync"
 
 	"github.com/gagliardetto/solana-go"
 )
@@ -23,7 +22,5 @@ type msgType struct {
 
 type recipientType struct {
 	key          solana.PublicKey
-	sending      bool
-	messageQueue [][]byte
-	mu           sync.Mutex
+	messageQueue chan []byte
 }

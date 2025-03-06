@@ -134,7 +134,7 @@ func delegateMessageAccount(ctx context.Context, contractClient *contract_client
 
 func subscribe(ctx context.Context, ps *pubsub.PubSub, topic string) {
 	ps.Subscribe(topic, func(ctx context.Context, event pubsub.Event) {
-		fmt.Printf("wsURL: %v, ID: %v, FromPeerId: %v, Message: %v\n", ctx.Value("wsURL"), event.ID, event.FromPeerId, event.Message)
+		fmt.Printf("%v (ID: %v, FromPeerId: %v, wsURL: %v)\n", string(event.Message), event.ID, event.FromPeerId, ctx.Value("wsURL"))
 	})
 
 	fmt.Printf("Subscribed to topic: %v\n", topic)
@@ -156,9 +156,11 @@ func publish(ctx context.Context, ps *pubsub.PubSub, topic string) {
 	for {
 		select {
 		case line := <-inputCh:
-			if _, err := ps.Publish(ctx, topic, []byte(line)); err != nil {
+			id, err := ps.Publish(topic, []byte(line))
+			if err != nil {
 				return
 			}
+			fmt.Printf("message=%v, id=%v\n", line, id)
 		case <-ctx.Done():
 			return
 		}
