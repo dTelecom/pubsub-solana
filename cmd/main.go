@@ -19,15 +19,15 @@ import (
 )
 
 const (
-	solanaRPC     = "https://api.devnet.solana.com"
-	solanaWS      = "wss://api.devnet.solana.com/"
-	magicblockRPC = "https://devnet.magicblock.app"
-	magicblockWS  = "wss://devnet.magicblock.app/"
+	solanaRPC    = "https://api.devnet.solana.com"
+	solanaWS     = "wss://api.devnet.solana.com/"
+	ephemeralRPC = "https://devnet.magicblock.app"
+	ephemeralWS  = "wss://devnet.magicblock.app/"
 
 	// solanaRPC     = "http://localhost:8899"
 	// solanaWS      = "ws://localhost:8900/"
-	// magicblockRPC = "http://localhost:8899"
-	// magicblockWS  = "ws://localhost:8900/"
+	// ephemeralRPC = "http://localhost:8899"
+	// ephemeralWS  = "ws://localhost:8900/"
 )
 
 type uuidGenerator struct{}
@@ -93,7 +93,7 @@ func main() {
 			delegateMessageAccount(ctx, contractClient, solana.MustPublicKeyFromBase58(*senderKeyFlag))
 		}
 	} else {
-		contractMagicblockClient := contract_client.New(true, magicblockRPC, magicblockWS, signer)
+		contractMagicblockClient := contract_client.New(true, ephemeralRPC, ephemeralWS, signer)
 		ps := pubsub.New(contractClient, contractMagicblockClient, &uuidGenerator{}, &zstdEncoder{})
 		if err := ps.Start(ctx, []solana.PublicKey{solana.MustPublicKeyFromBase58(*nodeKeyFlag)}); err != nil {
 			log.Fatal(err)
