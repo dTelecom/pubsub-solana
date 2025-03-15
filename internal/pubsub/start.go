@@ -20,13 +20,8 @@ func (p *PubSub) Start(ctx context.Context, nodeKeys []solana.PublicKey) error {
 
 		p.recipients[nodeKey] = recipient
 
-		if err := p.contractMagicblockClient.IncomingMessageSubscribe(ctx, nodeKey, p.makeIncomingHandler(nodeKey)); err != nil {
-			return fmt.Errorf("failed to subscribe to incoming messages: %w", err)
-		}
-
-		if err := p.contractMagicblockClient.OutgoingMessageSubscribe(ctx, nodeKey, p.makeOutgoingHandler(ctx, recipient)); err != nil {
-			return fmt.Errorf("failed to subscribe to outgoing messages: %w", err)
-		}
+		p.contractMagicblockClient.IncomingMessageSubscribe(ctx, nodeKey, p.makeIncomingHandler(nodeKey))
+		p.contractMagicblockClient.OutgoingMessageSubscribe(ctx, nodeKey, p.makeOutgoingHandler(ctx, recipient))
 	}
 
 	go func() {

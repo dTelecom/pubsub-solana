@@ -11,5 +11,5 @@ solana-test-validator \
   --bpf-program \
   DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh \
   $DIR/elfs/dlp.so \
-  --bpf-program 2qR7vH1k2G7jFYZH3e4hpmi2vq49ad7ehG6kUvL4t3MX \
+  --bpf-program 5NTgsFtbN9X3XEjepBeYbzRcwnguaE7niz74QhRBMqGU \
   $DIR/elfs/messenger.so

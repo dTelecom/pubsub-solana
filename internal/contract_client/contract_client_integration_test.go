@@ -103,10 +103,9 @@ func TestClient_Happy(t *testing.T) {
 
 	t.Run("MessageSubscribe", func(t *testing.T) {
 		ch := make(chan contract_client.MessageData, 1)
-		err := c.IncomingMessageSubscribe(ctx, signer.PublicKey(), func(_ context.Context, msg contract_client.MessageData) {
+		c.IncomingMessageSubscribe(ctx, signer.PublicKey(), func(_ context.Context, msg contract_client.MessageData) {
 			ch <- msg
 		})
-		require.NoError(t, err, "Error subscribing to incoming message change")
 
 		select {
 		case messageData := <-ch:

@@ -18,9 +18,9 @@ type ContractClient interface {
 	// MarkAsRead помечает сообщение как прочитанное
 	MarkAsRead(ctx context.Context, sender solana.PublicKey, timestamp int64) (solana.Signature, error)
 	// IncomingMessageSubscribe делает подписку на изменение данных во входящих сообщениях
-	IncomingMessageSubscribe(ctx context.Context, sender solana.PublicKey, handler func(context.Context, contract_client.MessageData)) error
+	IncomingMessageSubscribe(ctx context.Context, sender solana.PublicKey, handler func(context.Context, contract_client.MessageData))
 	// OutgoingMessageSubscribe делает подписку на изменение данных в исходящих сообщениях
-	OutgoingMessageSubscribe(ctx context.Context, receiver solana.PublicKey, handler func(context.Context, contract_client.MessageData)) error
+	OutgoingMessageSubscribe(ctx context.Context, receiver solana.PublicKey, handler func(context.Context, contract_client.MessageData))
 }
 
 type MessageIdGenerator interface {

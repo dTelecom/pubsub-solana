@@ -37,11 +37,9 @@ func (m *MockContractClient) EXPECT() *MockContractClientMockRecorder {
 }
 
 // IncomingMessageSubscribe mocks base method.
-func (m *MockContractClient) IncomingMessageSubscribe(ctx context.Context, sender solana.PublicKey, handler func(context.Context, contract_client.MessageData)) error {
+func (m *MockContractClient) IncomingMessageSubscribe(ctx context.Context, sender solana.PublicKey, handler func(context.Context, contract_client.MessageData)) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IncomingMessageSubscribe", ctx, sender, handler)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "IncomingMessageSubscribe", ctx, sender, handler)
 }
 
 // IncomingMessageSubscribe indicates an expected call of IncomingMessageSubscribe.
@@ -80,11 +78,9 @@ func (mr *MockContractClientMockRecorder) MarkAsRead(ctx, sender, timestamp inte
 }
 
 // OutgoingMessageSubscribe mocks base method.
-func (m *MockContractClient) OutgoingMessageSubscribe(ctx context.Context, receiver solana.PublicKey, handler func(context.Context, contract_client.MessageData)) error {
+func (m *MockContractClient) OutgoingMessageSubscribe(ctx context.Context, receiver solana.PublicKey, handler func(context.Context, contract_client.MessageData)) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "OutgoingMessageSubscribe", ctx, receiver, handler)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "OutgoingMessageSubscribe", ctx, receiver, handler)
 }
 
 // OutgoingMessageSubscribe indicates an expected call of OutgoingMessageSubscribe.

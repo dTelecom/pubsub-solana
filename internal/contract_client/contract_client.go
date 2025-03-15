@@ -1,7 +1,7 @@
 package contract_client
 
 import (
-	"context"
+	"sync"
 
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/rpc"
@@ -18,7 +18,9 @@ type SolanaClient struct {
 	isEphemeral   bool
 	counterPubkey solana.PublicKey
 	rpcClient     *rpc.Client
+	wsURL         string
 	wsClient      *ws.Client
+	wsMu          sync.Mutex
 	signer        solana.PrivateKey
 	commitment    rpc.CommitmentType
 
@@ -29,19 +31,14 @@ type SolanaClient struct {
 func New(isEphemeral bool, rpcURL, wsURL string, signer solana.PrivateKey) *SolanaClient {
 	counterPubkey, _, _ := solana.FindProgramAddress([][]byte{[]byte("node_counter")}, programID)
 
-	// todo: reconnect
-	wsClient, err := ws.Connect(context.Background(), wsURL)
-	if err != nil {
-		panic(err)
-	}
-
 	return &SolanaClient{
 		isEphemeral:   isEphemeral,
 		counterPubkey: counterPubkey,
 		rpcClient:     rpc.New(rpcURL),
-		wsClient:      wsClient,
-		signer:        signer,
-		commitment:    rpc.CommitmentConfirmed,
+		wsURL:         wsURL,
+
+		signer:     signer,
+		commitment: rpc.CommitmentConfirmed,
 
 		logContext: map[string]string{"rpcURL": rpcURL, "wsURL": wsURL},
 	}
