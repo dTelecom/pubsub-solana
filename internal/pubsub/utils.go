@@ -3,7 +3,6 @@ package pubsub
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -24,20 +23,20 @@ func (p *PubSub) makeIncomingHandler(sender solana.PublicKey) func(ctx context.C
 
 		defer func() {
 			if _, err := p.contractMagicblockClient.MarkAsRead(ctx, sender, data.TimeStamp); err != nil {
-				fmt.Printf("failed to mark message as read: %v\n", err)
+				p.logger.Errorw("Failed to mark message as read", err)
 			}
 		}()
 
 		if len(data.Content) > 0 {
 			decoded, err := p.dataEncoder.Decode(data.Content)
 			if err != nil {
-				fmt.Printf("failed to decode incoming message: %v\n", err)
+				p.logger.Errorw("Failed to decode incoming message", err)
 				return
 			}
 
 			var msg msgType
 			if err := borsh.Deserialize(&msg, decoded); err != nil {
-				fmt.Printf("failed to deserialize incoming message: %v\n", err)
+				p.logger.Errorw("Failed to deserialize incoming message", err)
 				return
 			}
 
@@ -91,7 +90,7 @@ func (p *PubSub) makeOutgoingHandler(ctx context.Context, recipient *recipientTy
 					if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 						return
 					}
-					fmt.Printf("failed to send message: %v\n", err)
+					p.logger.Errorw("Failed to send message", err)
 					delay := baseDelay * (1 << (attempt - 1))
 					if delay > maxDelay {
 						delay = maxDelay

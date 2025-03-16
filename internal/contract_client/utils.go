@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/AlekSi/pointer"
@@ -28,10 +27,10 @@ func (c *SolanaClient) WaitForProgramReadiness(ctx context.Context) error {
 				&rpc.GetAccountInfoOpts{Commitment: rpc.CommitmentFinalized},
 			)
 			if err == nil && info != nil && len(info.Bytes()) > 0 {
-				log.Println("Program is active and ready for work!")
+				c.logger.Infow("Program is active and ready for work!")
 				return nil
 			}
-			log.Printf("Waiting program readiness. Cause: %s\n", err)
+			c.logger.Debugw("Waiting program readiness. Cause: %s\n", err)
 		}
 	}
 }
@@ -50,11 +49,11 @@ func (c *SolanaClient) WaitForTransactionConfirmation(ctx context.Context, signa
 			}
 
 			if status.Value[0] != nil && status.Value[0].ConfirmationStatus == rpc.ConfirmationStatusType(c.commitment) {
-				log.Println("Transaction is confirmed!")
+				c.logger.Debugw("Transaction is confirmed!")
 				return nil
 			}
 
-			log.Println("Waiting confirmation of transaction Ожидание подтверждения транзакции...")
+			c.logger.Debugw("Waiting confirmation of transaction...")
 		}
 	}
 }
@@ -62,7 +61,7 @@ func (c *SolanaClient) WaitForTransactionConfirmation(ctx context.Context, signa
 func (c *SolanaClient) getLatestBlockhash(ctx context.Context) (solana.Hash, error) {
 	blockhashResp, err := c.rpcClient.GetLatestBlockhash(ctx, c.commitment)
 	if err != nil {
-		return solana.Hash{}, fmt.Errorf("❌ Get latest blockhash error: %v", err)
+		return solana.Hash{}, fmt.Errorf("get latest blockhash error: %v", err)
 	}
 	return blockhashResp.Value.Blockhash, nil
 }
@@ -90,7 +89,7 @@ func (c *SolanaClient) sendTransaction(ctx context.Context, tx *solana.Transacti
 		},
 	)
 	if err != nil {
-		return zeroSignature, fmt.Errorf("❌ Transaction sign error: %v", err)
+		return zeroSignature, fmt.Errorf("transaction sign error: %v", err)
 	}
 
 	signagure, err := c.rpcClient.SendTransactionWithOpts(
@@ -102,10 +101,10 @@ func (c *SolanaClient) sendTransaction(ctx context.Context, tx *solana.Transacti
 			MaxRetries:          pointer.ToUint(5),
 		})
 	if err != nil {
-		return zeroSignature, fmt.Errorf("❌ Transaction send error: %v", err)
+		return zeroSignature, fmt.Errorf("transaction send error: %v", err)
 	}
 
-	fmt.Println("✅ Transaction has been sent!")
+	c.logger.Debugw("✅ Transaction has been sent!")
 	return signagure, nil
 }
 
@@ -142,11 +141,11 @@ func (c *SolanaClient) getMessageData(ctx context.Context, messagePubKey solana.
 			DataSlice:  nil,
 		})
 	if err != nil {
-		return res, fmt.Errorf("Cannot get MessageData account: %w", err)
+		return res, fmt.Errorf("cannot get MessageData account: %w", err)
 	}
 
 	if err := borsh.Deserialize(&res, accountInfo.Value.Data.GetBinary()[8:]); err != nil {
-		return res, fmt.Errorf("Deserialization of MessageData error: %w", err)
+		return res, fmt.Errorf("deserialization of MessageData error: %w", err)
 	}
 	return res, nil
 }

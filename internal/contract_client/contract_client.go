@@ -6,6 +6,8 @@ import (
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/rpc"
 	"github.com/gagliardetto/solana-go/rpc/ws"
+
+	"github.com/dTelecom/pubsub-solana/internal/common"
 )
 
 // Smart contract address
@@ -15,6 +17,7 @@ var zeroSignature = solana.Signature{}
 
 // SolanaClient - structure for working with Solana
 type SolanaClient struct {
+	logger        common.Logger
 	isEphemeral   bool
 	counterPubkey solana.PublicKey
 	rpcClient     *rpc.Client
@@ -28,10 +31,11 @@ type SolanaClient struct {
 }
 
 // New create new client
-func New(isEphemeral bool, rpcURL, wsURL string, signer solana.PrivateKey) *SolanaClient {
+func New(logger common.Logger, isEphemeral bool, rpcURL, wsURL string, signer solana.PrivateKey) *SolanaClient {
 	counterPubkey, _, _ := solana.FindProgramAddress([][]byte{[]byte("node_counter")}, programID)
 
 	return &SolanaClient{
+		logger:        logger,
 		isEphemeral:   isEphemeral,
 		counterPubkey: counterPubkey,
 		rpcClient:     rpc.New(rpcURL),

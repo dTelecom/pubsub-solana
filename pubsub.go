@@ -7,6 +7,7 @@ import (
 	"github.com/gagliardetto/solana-go"
 	"github.com/google/uuid"
 
+	"github.com/dTelecom/pubsub-solana/internal/common"
 	"github.com/dTelecom/pubsub-solana/internal/contract_client"
 	pubsub_internal "github.com/dTelecom/pubsub-solana/internal/pubsub"
 )
@@ -40,14 +41,14 @@ type PubSub struct {
 	peerId string
 }
 
-func New(solanaRPC, solanaWS, ephemeralRPC, ephemeralWS, privateKey string) *PubSub {
+func New(logger common.Logger, solanaRPC, solanaWS, ephemeralRPC, ephemeralWS, privateKey string) *PubSub {
 	signer := solana.MustPrivateKeyFromBase58(privateKey)
 
-	solanaClient := contract_client.New(false, solanaRPC, solanaWS, signer)
-	ephemeralClient := contract_client.New(true, ephemeralRPC, ephemeralWS, signer)
+	solanaClient := contract_client.New(logger, false, solanaRPC, solanaWS, signer)
+	ephemeralClient := contract_client.New(logger, true, ephemeralRPC, ephemeralWS, signer)
 
 	return &PubSub{
-		pubsub_internal.New(solanaClient, ephemeralClient, &uuidGenerator{}, &zstdEncoder{}),
+		pubsub_internal.New(logger, solanaClient, ephemeralClient, &uuidGenerator{}, &zstdEncoder{}),
 		signer.PublicKey().String(),
 	}
 }

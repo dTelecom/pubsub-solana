@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/rpc/ws"
@@ -32,13 +31,13 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 				if errors.Is(err, context.Canceled) {
 					return
 				}
-				log.Printf("failed to get websocket client: %s\n", err)
+				c.logger.Errorw("Failed to get websocket client", err)
 				continue
 			}
 
 			sub, err := wsClient.AccountSubscribe(messagePubkey, c.commitment)
 			if err != nil {
-				log.Printf("message subscription error: %s\n", err)
+				c.logger.Errorw("Message subscription error", err)
 				c.clearWSClient(wsClient)
 				continue
 			}
@@ -51,7 +50,7 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 					if errors.Is(err, context.Canceled) {
 						return
 					}
-					log.Printf("Failed to lazy reload message account: %s", err)
+					c.logger.Errorw("Failed to lazy reload message account: %s", err)
 					continue
 				}
 			}
@@ -75,7 +74,7 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 					if errors.Is(err, context.Canceled) {
 						return
 					}
-					log.Printf("Receive error: %v", err)
+					c.logger.Errorw("Receive error: %v", err)
 					// websocket connection is probably broken
 					c.clearWSClient(wsClient)
 					continue mainFor
@@ -86,7 +85,7 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 
 				var messageData MessageData
 				if err := borsh.Deserialize(&messageData, data); err != nil {
-					log.Printf("Cannot deserialize message data: %v", err)
+					c.logger.Warnw("Cannot deserialize message data", err)
 				} else {
 					handler(ctx, messageData)
 				}

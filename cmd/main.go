@@ -14,6 +14,7 @@ import (
 	"github.com/gagliardetto/solana-go"
 	"github.com/google/uuid"
 
+	"github.com/dTelecom/pubsub-solana/internal/common"
 	"github.com/dTelecom/pubsub-solana/internal/contract_client"
 	"github.com/dTelecom/pubsub-solana/internal/pubsub"
 )
@@ -83,7 +84,9 @@ func main() {
 		cancel()
 	}()
 
-	contractClient := contract_client.New(false, solanaRPC, solanaWS, signer)
+	logger := new(common.ConsoleLogger)
+
+	contractClient := contract_client.New(logger, false, solanaRPC, solanaWS, signer)
 
 	if *initMessageAccountFlag || *delegateMessageAccountFlag {
 		switch {
@@ -93,8 +96,8 @@ func main() {
 			delegateMessageAccount(ctx, contractClient, solana.MustPublicKeyFromBase58(*senderKeyFlag))
 		}
 	} else {
-		contractMagicblockClient := contract_client.New(true, ephemeralRPC, ephemeralWS, signer)
-		ps := pubsub.New(contractClient, contractMagicblockClient, &uuidGenerator{}, &zstdEncoder{})
+		contractMagicblockClient := contract_client.New(logger, true, ephemeralRPC, ephemeralWS, signer)
+		ps := pubsub.New(logger, contractClient, contractMagicblockClient, &uuidGenerator{}, &zstdEncoder{})
 		if err := ps.Start(ctx, []solana.PublicKey{solana.MustPublicKeyFromBase58(*nodeKeyFlag)}); err != nil {
 			log.Fatal(err)
 		}

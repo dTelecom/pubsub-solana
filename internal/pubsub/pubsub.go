@@ -4,9 +4,12 @@ import (
 	"sync"
 
 	"github.com/gagliardetto/solana-go"
+
+	"github.com/dTelecom/pubsub-solana/internal/common"
 )
 
 type PubSub struct {
+	logger                   common.Logger
 	contractClient           ContractClient
 	contractMagicblockClient ContractClient
 	messageIdGenerator       MessageIdGenerator
@@ -19,8 +22,9 @@ type PubSub struct {
 	subscriptionsMu sync.RWMutex
 }
 
-func New(client, magicblockClient ContractClient, messageIdGenerator MessageIdGenerator, dataEncoder DataEncoder) *PubSub {
+func New(logger common.Logger, client, magicblockClient ContractClient, messageIdGenerator MessageIdGenerator, dataEncoder DataEncoder) *PubSub {
 	return &PubSub{
+		logger:                   logger,
 		contractClient:           client,
 		contractMagicblockClient: magicblockClient,
 		messageIdGenerator:       messageIdGenerator,

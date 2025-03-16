@@ -16,6 +16,7 @@ import (
 
 	"github.com/gagliardetto/solana-go"
 
+	"github.com/dTelecom/pubsub-solana/internal/common"
 	"github.com/dTelecom/pubsub-solana/internal/contract_client"
 )
 
@@ -39,7 +40,7 @@ func TestClient_Happy(t *testing.T) {
 		t.Fatalf("Error loading wallet: %v", err)
 	}
 
-	c := contract_client.New(false, "http://127.0.0.1:8899", "ws://127.0.0.1:8900", signer)
+	c := contract_client.New(new(common.ConsoleLogger), false, "http://127.0.0.1:8899", "ws://127.0.0.1:8900", signer)
 
 	t.Log("📌 Sender wallet:", signer.PublicKey().String())
 

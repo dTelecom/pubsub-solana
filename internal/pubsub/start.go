@@ -2,7 +2,6 @@ package pubsub
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gagliardetto/solana-go"
 )
@@ -38,7 +37,7 @@ func (p *PubSub) Start(ctx context.Context, nodeKeys []solana.PublicKey) error {
 					case recipient.messageQueue <- message:
 						continue
 					default:
-						fmt.Printf("recipient message queue is full: %v\n", recipient.key)
+						p.logger.Errorw("Recipient(%s) message queue is full", nil, recipient.key)
 					}
 				}
 			}

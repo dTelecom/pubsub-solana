@@ -10,6 +10,7 @@ import (
 	"github.com/near/borsh-go"
 	"github.com/stretchr/testify/require"
 
+	"github.com/dTelecom/pubsub-solana/internal/common"
 	"github.com/dTelecom/pubsub-solana/internal/contract_client"
 	"github.com/dTelecom/pubsub-solana/internal/pubsub"
 	"github.com/dTelecom/pubsub-solana/internal/pubsub/mocks"
@@ -58,7 +59,7 @@ func Test_Happy(t *testing.T) {
 	solanaClient := mocks.NewMockContractClient(ctrl)
 	magicblockClient := mocks.NewMockContractClient(ctrl)
 	messageIdGenerator := mocks.NewMockMessageIdGenerator(ctrl)
-	ps := pubsub.New(solanaClient, magicblockClient, messageIdGenerator, &dataEncoder)
+	ps := pubsub.New(new(common.ConsoleLogger), solanaClient, magicblockClient, messageIdGenerator, &dataEncoder)
 
 	var incomingMessageHandler func(context.Context, contract_client.MessageData)
 	var outgoingMessageHandler func(context.Context, contract_client.MessageData)
