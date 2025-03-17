@@ -8,7 +8,7 @@ import (
 
 // MarkAsRead marking the message as read
 func (c *SolanaClient) MarkAsRead(ctx context.Context, sender solana.PublicKey, timestamp int64) (solana.Signature, error) {
-	c.logger.Debugw("➡️ Marking message as read for sender %s", sender)
+	c.logger.Debugw("➡️ Marking message as read for", "sender", sender)
 
 	messagePubkey, _, _ := solana.FindProgramAddress([][]byte{
 		[]byte("message"),

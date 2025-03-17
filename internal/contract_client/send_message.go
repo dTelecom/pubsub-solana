@@ -9,7 +9,7 @@ import (
 
 // SendMessage put message to message account
 func (c *SolanaClient) SendMessage(ctx context.Context, receiver solana.PublicKey, content []byte) (solana.Signature, error) {
-	c.logger.Debugw("➡️ Sending message to %v\n", receiver)
+	c.logger.Debugw("➡️ Sending message", "receiver", receiver, "message", string(content))
 
 	if len(content) > 887 {
 		return zeroSignature, fmt.Errorf("message is too long (max. 887 bytes): %v", len(content))
