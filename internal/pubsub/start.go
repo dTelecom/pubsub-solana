@@ -37,7 +37,7 @@ func (p *PubSub) Start(ctx context.Context, nodeKeys []solana.PublicKey) error {
 					case recipient.messageQueue <- message:
 						continue
 					default:
-						p.logger.Errorw("Recipient(%s) message queue is full", nil, recipient.key)
+						p.logger.Errorw("Message queue is full", nil, "recipient", recipient.key)
 					}
 				}
 			}

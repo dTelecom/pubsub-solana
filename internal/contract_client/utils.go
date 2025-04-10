@@ -30,7 +30,7 @@ func (c *SolanaClient) WaitForProgramReadiness(ctx context.Context) error {
 				c.logger.Infow("Program is active and ready for work!")
 				return nil
 			}
-			c.logger.Debugw("Waiting program readiness. Cause: %s\n", err)
+			c.logger.Debugw("Waiting program readiness. Cause: %s\n", "error", err)
 		}
 	}
 }
