@@ -82,7 +82,7 @@ func (p *PubSub) makeOutgoingHandler(ctx context.Context, recipient *recipientTy
 				}
 				mu.Unlock()
 
-				for attempt := 0; ; attempt++ {
+				for attempt := 1; ; attempt++ {
 					_, err := p.contractMagicblockClient.SendMessage(ctx, recipient.key, message)
 					if err == nil {
 						break

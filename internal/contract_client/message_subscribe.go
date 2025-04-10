@@ -26,9 +26,17 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 	go func() {
 	mainFor:
 		for {
+			if c.isEphemeral {
+				// Airdrop to trigger lazy reload
+				_, _ = c.rpcClient.RequestAirdrop(ctx, messagePubkey, 1, "")
+				if ctx.Err() != nil {
+					return
+				}
+			}
+
 			wsClient, err := c.getWSClient(ctx)
 			if err != nil {
-				if errors.Is(err, context.Canceled) {
+				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 					return
 				}
 				c.logger.Errorw("Failed to get websocket client", err)
@@ -42,27 +50,14 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 				continue
 			}
 
-			if c.isEphemeral {
-				// Airdrop to trigger lazy reload
-				_, _ = c.rpcClient.RequestAirdrop(ctx, messagePubkey, 1, "")
-				if err != nil {
-					sub.Unsubscribe()
-					if errors.Is(err, context.Canceled) {
-						return
-					}
-					c.logger.Errorw("Failed to lazy reload message account: %s", err)
-					continue
-				}
-			}
-
 			initialMessageData, err := c.getMessageData(ctx, messagePubkey)
 			if err != nil {
-				// sub.Unsubscribe()
-				if errors.Is(err, context.Canceled) {
+				sub.Unsubscribe()
+				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 					return
 				}
-				// log.Printf("Cannot get initial message data: %s\n", err)
-				// continue
+				c.logger.Errorw("Cannot get initial message data", err)
+				continue
 			}
 
 			handler(ctx, initialMessageData)
@@ -71,7 +66,7 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 				got, err := sub.Recv(ctx)
 				if err != nil {
 					sub.Unsubscribe()
-					if errors.Is(err, context.Canceled) {
+					if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 						return
 					}
 					c.logger.Errorw("Receive error: %v", err)
