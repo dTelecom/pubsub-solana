@@ -69,7 +69,7 @@ func (c *SolanaClient) messageSubscribe(ctx context.Context, messagePubkey solan
 					if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 						return
 					}
-					c.logger.Errorw("Receive error: %v", err)
+					c.logger.Errorw("Receive error", err)
 					// websocket connection is probably broken
 					c.clearWSClient(wsClient)
 					continue mainFor
