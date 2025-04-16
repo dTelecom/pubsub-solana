@@ -20,10 +20,15 @@ import (
 )
 
 const (
-	solanaRPC    = "https://api.devnet.solana.com"
-	solanaWS     = "wss://api.devnet.solana.com/"
-	ephemeralRPC = "https://devnet.magicblock.app"
-	ephemeralWS  = "wss://devnet.magicblock.app/"
+	// solanaRPC    = "https://api.devnet.solana.com"
+	// solanaWS     = "wss://api.devnet.solana.com/"
+	// ephemeralRPC = "https://devnet.magicblock.app"
+	// ephemeralWS  = "wss://devnet.magicblock.app/"
+
+	solanaRPC    = "https://api.mainnet-beta.solana.com"
+	solanaWS     = "wss://api.mainnet-beta.solana.com/"
+	ephemeralRPC = "https://dtelecom.magicblock.app"
+	ephemeralWS  = "wss://dtelecom.magicblock.app/"
 
 	// solanaRPC     = "http://localhost:8899"
 	// solanaWS      = "ws://localhost:8900/"
